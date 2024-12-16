@@ -1,0 +1,9 @@
+# Ignore all private keys
+*.pem
+
+# Ignore 'example-voting-app' source code
+/example-voting-app
+
+# Ignore OS-specific files
+.DS_Store
+Thumbs.db
