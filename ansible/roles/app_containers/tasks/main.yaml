@@ -1,0 +1,98 @@
+---
+- name: Run postgres container
+  community.docker.docker_container:
+    name: db
+    image: postgres:17.2
+    state: started
+    restart_policy: always
+    recreate: true # Ensures idempotency by recreating the container if needed
+    env:
+      POSTGRES_USER:
+      POSTGRES_PASSWORD:
+      POSTGRES_DB:
+    volumes:
+      - pgdata:/var/lib/postgresql/data # Persist Postgres data
+    networks:
+      - name: backend
+
+- name: Create external volume for Postgres data
+  community.docker.docker_volume:
+    name: pgdata # External volume for Postgres data
+    state: present
+
+- name: Copy pgAdmin servers configuration
+  ansible.builtin.copy:
+    src: pgadmin_servers.json
+    dest: /tmp/pgadmin_servers.json
+
+- name: Run pgAdmin container
+  community.docker.docker_container:
+    name: pgadmin
+    image: dpage/pgadmin4:8.14.0
+    state: started
+    restart_policy: always
+    ports:
+      - "5050:80"
+    env:
+      PGADMIN_DEFAULT_EMAIL:
+      PGADMIN_DEFAULT_PASSWORD:
+    volumes:
+      - /tmp/pgadmin_servers.json:/pgadmin4/servers.json:ro # Mount servers.json
+    networks:
+      - name: backend
+
+- name: Run redis container
+  community.docker.docker_container:
+    name: redis
+    image: redis:8.0-M02-alpine
+    state: started
+    restart_policy: always
+    networks:
+      - name: frontend
+
+- name: Pull Docker image for vote-app
+  community.docker.docker_image:
+    name: navin360/vote
+    source: pull
+
+- name: Run vote app container
+  community.docker.docker_container:
+    name: vote-app
+    image: navin360/vote
+    state: started
+    restart_policy: always
+    ports:
+      - "8080:80"
+    networks:
+      - name: frontend
+
+- name: Pull Docker image for result-app
+  community.docker.docker_image:
+    name: navin360/result
+    source: pull
+
+- name: Run result app container
+  community.docker.docker_container:
+    name: result-app
+    image: navin360/result
+    state: started
+    restart_policy: always
+    ports:
+      - "8081:80"
+    networks:
+      - name: backend
+
+- name: Pull Docker image for worker-app
+  community.docker.docker_image:
+    name: navin360/worker
+    source: pull
+
+- name: Run worker app container
+  community.docker.docker_container:
+    name: worker-app
+    image: navin360/worker
+    state: started
+    restart_policy: always
+    networks:
+      - name: frontend
+      - name: backend
