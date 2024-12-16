@@ -1,0 +1,14 @@
+---
+- name: Add public key to authorized_keys
+  ansible.builtin.authorized_key:
+    user: ubuntu
+    state: present
+    key: "{{ lookup('file', '~/.ssh/id_rsa_grenale.pub') }}"
+
+- name: Replace '../gan_kp.pem' with '~/.ssh/id_rsa_grenale.pub' in hosts.ini
+  ansible.builtin.replace:
+    path: "/home/alex/Code/bootcamp/project1c/ansible/inventory/hosts.ini"
+    regexp: "../gan_kp.pem"
+    replace: "~/.ssh/id_rsa_grenale"
+  delegate_to: localhost
+  become: false
