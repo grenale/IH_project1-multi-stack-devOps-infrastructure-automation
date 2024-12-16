@@ -1,0 +1,9 @@
+---
+- name: Set up EC2 instance and Docker environment
+  hosts: all
+  become: true
+  roles:
+    - authorized_keys
+    - docker
+    - network
+    - app_containers
