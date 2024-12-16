@@ -1,0 +1,20 @@
+# Local Terraform state files
+*.tfstate
+*.tfstate.backup
+
+# Crash log files
+crash.log
+
+# Exclude sensitive files
+*.tfvars
+*.tfvars.json
+
+# Ignore plan output files
+*.tfplan
+
+# Ignore Terraform directories
+.terraform/
+
+# Ignore OS-specific files
+.DS_Store
+Thumbs.db

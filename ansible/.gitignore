@@ -1,0 +1,6 @@
+# Ignore file with database connection details
+pgadmin_servers.json
+
+# Ignore OS-specific files
+.DS_Store
+Thumbs.db
